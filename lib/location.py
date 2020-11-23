@@ -9,11 +9,11 @@ import gpsd
 
 
 class Location:
-    def __init__(self, gpsd_host='127.0.0.1', gpsd_port=2947):
         """
         Location data class.
         """
 
+    def __init__(self, gpsd_host='127.0.0.1', gpsd_port=2947):
         self.__gpsd_host = gpsd_host
         self.__gpsd_port = gpsd_port
 

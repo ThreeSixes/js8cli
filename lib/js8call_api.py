@@ -10,11 +10,11 @@ import traceback
 
 
 class JS8CallAPI:
-    def __init__(self, host, port, mode="tcp"):
         """
         JS8Call API
         """
 
+    def __init__(self, host, port, mode="tcp"):
         self.__host = host
         self.__port = port
 

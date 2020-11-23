@@ -7,10 +7,11 @@ import json
 import os
 
 class Configurator:
+    """
+    Generate the JS8Call CLI configuration
+    """
+
     def __init__(self, config_file):
-        """
-        Generate the JS8Call CLI configuration
-        """
 
         self.__config_file = config_file
 
