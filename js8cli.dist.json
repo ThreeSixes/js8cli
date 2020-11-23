@@ -1,0 +1,9 @@
+{
+  "gpsd_host": "127.0.0.1",
+  "gpsd_port": 2947,
+  "grid_level": 6,
+  "js8call_host": "127.0.0.1",
+  "js8call_port": 2442,
+  "js8call_proto": "tcp",
+  "log_level": "info"
+}
