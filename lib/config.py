@@ -10,7 +10,6 @@ class Configurator:
     """
     Generate the JS8Call CLI configuration
     """
-
     def __init__(self, config_file):
 
         self.__config_file = config_file
