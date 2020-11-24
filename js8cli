@@ -4,19 +4,20 @@ import argparse
 import logging
 from pprint import pprint
 
+from lib import Automation
 from lib import Configurator
 from lib import JS8CallAPI
 from lib import Location
-
 
 if __name__ == '__main__':
     configurator = Configurator(config_file="js8cli.json")
     cfg = configurator.configure()
 
     js8callapi = JS8CallAPI(cfg['js8call_host'], cfg['js8call_port'])
-
     location = Location(gpsd_host=cfg['gpsd_host'], gpsd_port=cfg['gpsd_port'])
 
-    pprint(cfg)
-    pprint(location.coords())
-    pprint(location.maidenhead(level=cfg['grid_level']))
+    mh = location.maidenhead(level=cfg['grid_level'])
+    if mh['lock']:
+        js8callapi.set_grid(mh['grid'])
+    else:
+        logger.warn("No GPS lock. Couldn't set JS8Call grid square.")
