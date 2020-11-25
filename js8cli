@@ -4,7 +4,7 @@ import argparse
 import logging
 from pprint import pprint
 
-from lib import Automation
+from lib import Automator
 from lib import Configurator
 from lib import JS8CallAPI
 from lib import Location
@@ -12,6 +12,40 @@ from lib import Location
 if __name__ == '__main__':
     configurator = Configurator(config_file="js8cli.json")
     cfg = configurator.configure()
+
+    cmd_desccription = """js8cli is a simple command-line utility and daemon to interact with js8call."""
+
+    parser = argparse.ArgumentParser(description="")
+    parser.add_argument('command', type=str, 
+                        help='Command to execute: aprsgrid, setgrid, aprssms')
+    parser.add_argument('-d', dest="dontsend", type=bool, default=False,
+                        help="Don't send immediately. Use with commands that send messages.")
+    parser.add_argument('-D', dest="daemon", type=bool, default=False,
+                        help="Kick off automated daemon.")
+    parser.add_argument('--js8-host', type=str, default=None,
+                        help="JS8Call API hostname.")
+    parser.add_argument('--js8-port', type=int, default=None,
+                        help="JS8Call API port.")
+    parser.add_argument('--js8-proto', type=str, choices=["tcp", "udp"], default=None,
+                        help="JS8Call API protocol.")
+    parser.add_argument('--grid', type=int, choices=[1, 2, 3, 4, 5], default=None,
+                        help="Maidenhead grid accuracy. 1-5")
+    parser.add_argument('--to', type=str,
+                        help="Send to specific destination. Use with message and APRS commands.")
+    parser.add_argument('--gpsd-host', type=str, default=None,
+                        help="GPSD hostname.")
+    parser.add_argument('--gpsd-port', type=int, default=None,
+                        help="GPSD port.")
+#    parser.add_argument('--lat', type=float, default=None,
+#                        help="Latitude. Use to override GPS latitude.")
+#    parser.add_argument('--lon', type=float, default=None,
+#                        help="Longitude. Use to override GPS longitude.")
+#    parser.add_argument('--alt', type=float, default=None,
+#                        help="Altitude in feet. Use to override GPS altitude.")
+ 
+    args = parser.parse_args()
+    print(repr(args))
+    exit(0)
 
     js8callapi = JS8CallAPI(cfg['js8call_host'], cfg['js8call_port'])
     location = Location(gpsd_host=cfg['gpsd_host'], gpsd_port=cfg['gpsd_port'])
@@ -21,3 +55,7 @@ if __name__ == '__main__':
         js8callapi.set_grid(mh['grid'])
     else:
         logger.warn("No GPS lock. Couldn't set JS8Call grid square.")
+
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('command', type=str, 
+                        help='Command to execute: setgrid, sms, aprsgrid')
