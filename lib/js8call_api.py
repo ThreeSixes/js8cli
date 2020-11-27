@@ -94,7 +94,7 @@ class JS8CallAPI:
         set_msg = {
             "params": {},
             "type": "TX.SEND_MESSAGE",
-            "value": message
+            "value": msg
         } 
 
         self.__send_message(set_msg)

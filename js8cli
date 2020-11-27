@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import os
 from pprint import pprint
 
 from lib import Automator
@@ -10,18 +11,18 @@ from lib import JS8CallAPI
 from lib import Location
 
 if __name__ == '__main__':
-    configurator = Configurator(config_file="js8cli.json")
-    cfg = configurator.configure()
+    # Build our configurator.
+    config_path = os.path.dirname(os.path.abspath(__file__))
+    config_file = "%s/js8cli.json" %config_path
+    configurator = Configurator(config_file=config_file)
 
+    # Command-line arguments.
     cmd_desccription = """js8cli is a simple command-line utility and daemon to interact with js8call."""
-
-    parser = argparse.ArgumentParser(description="")
+    parser = argparse.ArgumentParser(description=cmd_desccription)
     parser.add_argument('command', type=str, 
-                        help='Command to execute: aprsgrid, setgrid, aprssms')
-    parser.add_argument('-d', dest="dontsend", type=bool, default=False,
+                        help='Command to execute: aprsgrid, aprssms, daemon, setgrid')
+    parser.add_argument('-d', dest="dontsend", default=False, action="store_true",
                         help="Don't send immediately. Use with commands that send messages.")
-    parser.add_argument('-D', dest="daemon", type=bool, default=False,
-                        help="Kick off automated daemon.")
     parser.add_argument('--js8-host', type=str, default=None,
                         help="JS8Call API hostname.")
     parser.add_argument('--js8-port', type=int, default=None,
@@ -32,30 +33,54 @@ if __name__ == '__main__':
                         help="Maidenhead grid accuracy. 1-5")
     parser.add_argument('--to', type=str,
                         help="Send to specific destination. Use with message and APRS commands.")
+    parser.add_argument('--msg', type=str,
+                        help="Message to send. Use with message and APRS commands.")
     parser.add_argument('--gpsd-host', type=str, default=None,
                         help="GPSD hostname.")
     parser.add_argument('--gpsd-port', type=int, default=None,
                         help="GPSD port.")
-#    parser.add_argument('--lat', type=float, default=None,
-#                        help="Latitude. Use to override GPS latitude.")
-#    parser.add_argument('--lon', type=float, default=None,
-#                        help="Longitude. Use to override GPS longitude.")
-#    parser.add_argument('--alt', type=float, default=None,
-#                        help="Altitude in feet. Use to override GPS altitude.")
- 
     args = parser.parse_args()
-    print(repr(args))
-    exit(0)
 
-    js8callapi = JS8CallAPI(cfg['js8call_host'], cfg['js8call_port'])
-    location = Location(gpsd_host=cfg['gpsd_host'], gpsd_port=cfg['gpsd_port'])
+    # CLI config overrides.
+    configurator.set_js8_connection(host=args.js8_host, port=args.js8_port,
+        proto=args.js8_proto)
+    configurator.set_gpsd_connection(host=args.gpsd_host, port=args.gpsd_port)
+    configurator.set_maidenhead(level=args.grid)
+    cfg = configurator.configure()
 
-    mh = location.maidenhead(level=cfg['grid_level'])
-    if mh['lock']:
-        js8callapi.set_grid(mh['grid'])
-    else:
-        logger.warn("No GPS lock. Couldn't set JS8Call grid square.")
-
-    parser = argparse.ArgumentParser(description='')
-    parser.add_argument('command', type=str, 
-                        help='Command to execute: setgrid, sms, aprsgrid')
+    # Handle incoming commands.
+    if args.command == "daemon":
+        pass
+    elif args.command == "aprsgrid":
+        js8callapi = JS8CallAPI(cfg['js8call_host'], cfg['js8call_port'])
+        location = Location(gpsd_host=cfg['gpsd_host'], gpsd_port=cfg['gpsd_port'])
+        mh = location.maidenhead(level=cfg['grid_level'])
+        if mh['lock']:
+            msg = "@APRSIS GRID %s" %mh['grid']
+            if args.dontsend:
+                js8callapi.set_text(msg)
+            else:
+                js8callapi.send_message(msg)
+        else:
+            logger.warn("No GPS lock. Couldn't set JS8Call grid square.")
+            quit(1)
+    elif args.command == "aprssms":
+        js8callapi = JS8CallAPI(cfg['js8call_host'], cfg['js8call_port'])
+        if args.to is None or args.msg is None:
+            print("--to and --msg are required with setgrid.")
+            exit(1)
+        else:
+            cmd = "@APRSIS CMD :SMSGTE :@%s %s" %(args.to, args.msg)
+            if args.dontsend:
+                js8callapi.set_text(cmd)
+            else:
+                js8callapi.send_message(cmd)
+    elif args.command == "setgrid":
+        js8callapi = JS8CallAPI(cfg['js8call_host'], cfg['js8call_port'])
+        location = Location(gpsd_host=cfg['gpsd_host'], gpsd_port=cfg['gpsd_port'])
+        mh = location.maidenhead(level=cfg['grid_level'])
+        if mh['lock']:
+            js8callapi.set_grid(mh['grid'])
+        else:
+            print("No GPS lock. Couldn't set JS8Call grid square.")
+            exit(1)
