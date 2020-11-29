@@ -16,7 +16,7 @@ class Automator:
         Automate JS8Call actions
         """
         self.__config = config
-        self.__retry_timers = [0, 1, 1, 2, 3, 5, 8]
+        self.__retry_timers = [0, 1, 1, 2, 3, 5, 8, 13]
         self.__se = sys.stderr.write
         self.__so = sys.stdout.write
 
