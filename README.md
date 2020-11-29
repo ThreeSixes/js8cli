@@ -36,11 +36,12 @@ Optional arguments:
 
 `js8cli aprssms --to 5555555555 --msg "Hello, world."`
 
-Where `--to` specifies a phone number or [smsgte.org](https://smsgte.org) alias, and `--msg` is the message contnent or shortcut you wish to send.
+Where `--to` specifies a phone number or [smsgte.org](https://smsgte.org) alias, and `--msg` is the message content or shortcut you wish to send.
 
 Optional arguments:
 
 `-d` prevents JS8Call from sending the message allowing the user to choose when to send it.
+
 
 ## Automatically updating JS8Call location and/or APRS grid location periodically.
 This is accomplished by either exeuting `js8cli daemon` or by copying the systemd configuration file into place, enabling and starting it after configuring `aprs_loc_update_min` and `js8call_loc_refresh_min` in `js8cli.json`. These settings configure the timing of APRS location updates in minutes and the JS8Call location updates from the GPS in minutes as well.
@@ -53,6 +54,7 @@ sudo systemctl enable js8cli
 sudo systemctl start js8cli
 ```
 
+### Configuration
 ```json
 {
   "aprs_loc_update_min": 0,
