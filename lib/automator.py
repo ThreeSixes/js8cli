@@ -123,5 +123,8 @@ class Automator:
         Automatically
         """
         self.__so("Daemon running.\n")
-        self.__timer_loop()
+        try:
+            self.__timer_loop()
+        except (KeyboardInterrupt, SystemExit):
+            self.__so("Caught interrupt.\n")
         self.__so("Daemon exiting.\n")
