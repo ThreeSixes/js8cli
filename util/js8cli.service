@@ -1,0 +1,9 @@
+[Unit]
+Description=JS8CLI service
+
+[Service]
+Type=simple
+ExecStart=/opt/threesixes/js8cli daemon
+
+[Install]
+WantedBy=multi-user.target
