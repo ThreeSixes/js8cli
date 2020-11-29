@@ -23,18 +23,31 @@ class Automator:
 
     def __timer_loop(self):
         """
-        Time calls.
+        Trigger calls on a timer.
         """
         run = True 
-        last_js8_update = None
-        last_loc_update = None
+        next_js8_update = datetime.datetime.now() + datetime.timedelta(minutes=-1)
+        next_loc_update = datetime.datetime.now() + datetime.timedelta(minutes=-1)
         while run:
-            if self.__config['js8call_loc_refresh_min'] > 0:
+            js8_run = False
+            loc_run = False
+            if datetime.datetime.now() >= next_js8_update:
+                js8_run = True
+            if datetime.datetime.now() >= next_loc_update:
+                loc_run = True
+            if js8_run:
+                if self.__config['js8call_loc_refresh_min'] > 0:
+                    self.__so("Updating JS8Call location.\n")
                     self.__update_js8_location()
-            if self.__config['aprs_loc_update_min'] > 0:
-                self.__send_aprs_location()
+                    next_js8_update = datetime.datetime.now() + datetime.timedelta(
+                        minutes=self.__config['js8call_loc_refresh_min'])
+            if loc_run:
+                if self.__config['aprs_loc_update_min'] > 0:
+                    self.__so("Updating APRS grid location.\n")
+                    self.__send_aprs_location()
+                    next_loc_update = datetime.datetime.now() + datetime.timedelta(
+                        minutes=self.__config['aprs_loc_update_min'])
             time.sleep(1)
-            run = False # TOOD unhack.
 
 
     def __update_js8_location(self):
@@ -53,18 +66,18 @@ class Automator:
                         js8callapi.set_grid(mh['grid'])
                         try_action = False
                     except ConnectionRefusedError:
-                        se("JS8Call API connection refused @ %s:%s\n"
+                        self.__se("JS8Call API connection refused @ %s:%s\n"
                             %(self.__config['js8call_host'], self.__config['js8call_port']))
                     except ConnectionResetError:
-                        se("JS8Call API connection reset @ %s:%s\n"
+                        self.__se("JS8Call API connection reset @ %s:%s\n"
                             %(self.__config['js8call_host'], self.__config['js8call_port']))
                 else:
-                    se("No GPS lock. Couldn't set JS8Call grid square.\n")
+                    self.__se("No GPS lock. Couldn't set JS8Call grid square.\n")
             except ConnectionRefusedError:
-                se("GPSD connection refused @ %s:%s\n"
+                self.__se("GPSD connection refused @ %s:%s\n"
                     %(self.__config['js8call_host'], self.__config['js8call_port']))
             except ConnectionResetError:
-                se("GPSD connection reset @ %s:%s\n"
+                self.__se("GPSD connection reset @ %s:%s\n"
                     %(self.__config['js8call_host'], self.__config['js8call_port']))
             if try_action:
                 time.sleep(self.__retry_timers[step])
@@ -82,23 +95,23 @@ class Automator:
             try:
                 location = Location(gpsd_host=self.__config['gpsd_host'], gpsd_port=self.__config['gpsd_port'])
                 mh = location.maidenhead(level=self.__config['grid_level'])
-                if mh['lock']:
+                if mh['lock'] is True and mh['grid'] != "":
                     try:
                         js8callapi.send_message("@APRSIS GRID %s" %mh['grid'])
                         try_action = False
                     except ConnectionRefusedError:
-                        se("JS8Call connection refused @ %s:%s\n"
+                        self.__se("JS8Call connection refused @ %s:%s\n"
                             %(self.__config['js8call_host'], self.__config['js8call_port']))
                     except ConnectionResetError:
-                        se("JS8Call connection reset @ %s:%s\n"
+                        self.__se("JS8Call connection reset @ %s:%s\n"
                             %(self.__config['js8call_host'], self.__config['js8call_port']))
                 else:
-                    se("No GPS lock. Couldn't send position to APRS.\n")
+                    self.__se("No GPS lock. Couldn't send position to APRS.\n")
             except ConnectionRefusedError:
-                se("GPSD connection refused @ %s:%s\n"
+                self.__se("GPSD connection refused @ %s:%s\n"
                     %(self.__config['js8call_host'], self.__config['js8call_port']))
             except ConnectionResetError:
-                se("GPSD connection reset @ %s:%s\n"
+                self.__se("GPSD connection reset @ %s:%s\n"
                     %(self.__config['js8call_host'], self.__config['js8call_port']))
             if try_action:
                 time.sleep(self.__retry_timers[step])
