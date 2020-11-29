@@ -1,6 +1,5 @@
 {
   "aprs_loc_update_min": 0,
-  "daemon_log_level": "info",
   "gpsd_host": "127.0.0.1",
   "gpsd_port": 2947,
   "grid_level": 4,
