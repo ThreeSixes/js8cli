@@ -1,15 +1,120 @@
 #!/usr/bin/env python3
 
+"""
+js8cli by ThreeSixes https://github.com/threesixes 28 Nov, 2020
+"""
+
 import argparse
 import logging
 import os
 from pprint import pprint
+import sys
 
 from lib import Automator
 from lib import Configurator
 from lib import JS8CallAPI
 from lib import Location
 
+se = sys.stderr.write
+so = sys.stdout.write
+
+def send_aprs_sms(to, msg, dontsend, cfg):
+    """
+    Send an APRS SMS message (msg) to a given destination (to).
+    """
+    js8callapi = JS8CallAPI(cfg['js8call_host'], cfg['js8call_port'])
+    if args.to is None or args.msg is None:
+        se("--to and --msg are required with setgrid.")
+        exit(1)
+    else:
+        try:
+            cmd = "@APRSIS CMD :SMSGTE :@%s %s" %(args.to, args.msg)
+            if dontsend:
+                js8callapi.set_text(cmd)
+            else:
+                js8callapi.send_message(cmd)
+        except ConnectionRefusedError:
+            se("JS8Call API connection refused @ %s:%s\n"
+                %(cfg['js8call_host'], cfg['js8call_port']))
+            exit(1)
+        except ConnectionResetError:
+            se("JS8Call API connection reset @ %s:%s\n"
+                %(cfg['js8call_host'], cfg['js8call_port']))
+            exit(1)
+
+
+def send_aprs_grid(dontsend, cfg):
+    """
+    Send an APRS SMS message (msg) to a given destination (to).
+    """
+    js8callapi = JS8CallAPI(cfg['js8call_host'], cfg['js8call_port'])
+    location = Location(gpsd_host=cfg['gpsd_host'], gpsd_port=cfg['gpsd_port'])
+    try:
+        mh = location.maidenhead(level=cfg['grid_level'])
+    except ConnectionRefusedError:
+        se("GPSD connection refused @ %s:%s\n"
+            %(cfg['js8call_host'], cfg['js8call_port']))
+        exit(1)
+    except ConnectionResetError:
+        se("GPSD connection reset @ %s:%s\n"
+            %(cfg['js8call_host'], cfg['js8call_port']))
+        exit(1)
+
+    if mh['lock']:
+        msg = "@APRSIS GRID %s" %mh['grid']
+        try:
+            if dontsend:
+                js8callapi.set_text(msg)
+            else:
+                js8callapi.send_message(msg)
+        except ConnectionRefusedError:
+            se("JS8Call API connection refused @ %s:%s\n"
+                %(cfg['js8call_host'], cfg['js8call_port']))
+            exit(1)
+        except ConnectionResetError:
+            se("JS8Call API connection reset @ %s:%s\n"
+                %(cfg['js8call_host'], cfg['js8call_port']))
+            exit(1)
+    else:
+        se("No GPS lock. Couldn't acquire location.")
+        quit(1)
+
+
+def set_js8call_grid(cfg):
+    """
+    Set JS8Call's grid square location.
+    """
+    js8callapi = JS8CallAPI(cfg['js8call_host'], cfg['js8call_port'])
+    location = Location(gpsd_host=cfg['gpsd_host'], gpsd_port=cfg['gpsd_port'])
+
+    try:
+        mh = location.maidenhead(level=cfg['grid_level'])
+    except ConnectionRefusedError:
+        se("GPSD connection refused @ %s:%s\n"
+            %(cfg['js8call_host'], cfg['js8call_port']))
+        exit(1)
+    except ConnectionResetError:
+        se("GPSD connection reset @ %s:%s\n"
+            %(cfg['js8call_host'], cfg['js8call_port']))
+        exit(1)
+
+    if mh['lock']:
+        try:
+            js8callapi.set_grid(mh['grid'])
+        except ConnectionRefusedError:
+            se("JS8Call API connection refused @ %s:%s\n"
+                %(cfg['js8call_host'], cfg['js8call_port']))
+            exit(1)
+        except ConnectionResetError:
+            se("JS8Call API connection reset @ %s:%s\n"
+                %(cfg['js8call_host'], cfg['js8call_port']))
+            exit(1)
+    else:
+        se("No GPS lock. Couldn't set JS8Call grid square.\n")
+        exit(1)
+
+
+# Entrypoint when called as a script.
 if __name__ == '__main__':
     # Build our configurator.
     config_path = os.path.dirname(os.path.abspath(__file__))
@@ -50,37 +155,15 @@ if __name__ == '__main__':
 
     # Handle incoming commands.
     if args.command == "daemon":
-        pass
+        so("Staring daemon...\n")
+        automator = Automator(cfg)
+        automator.run()
     elif args.command == "aprsgrid":
-        js8callapi = JS8CallAPI(cfg['js8call_host'], cfg['js8call_port'])
-        location = Location(gpsd_host=cfg['gpsd_host'], gpsd_port=cfg['gpsd_port'])
-        mh = location.maidenhead(level=cfg['grid_level'])
-        if mh['lock']:
-            msg = "@APRSIS GRID %s" %mh['grid']
-            if args.dontsend:
-                js8callapi.set_text(msg)
-            else:
-                js8callapi.send_message(msg)
-        else:
-            logger.warn("No GPS lock. Couldn't set JS8Call grid square.")
-            quit(1)
+        send_aprs_grid(args.dontsend, cfg)
     elif args.command == "aprssms":
-        js8callapi = JS8CallAPI(cfg['js8call_host'], cfg['js8call_port'])
-        if args.to is None or args.msg is None:
-            print("--to and --msg are required with setgrid.")
-            exit(1)
-        else:
-            cmd = "@APRSIS CMD :SMSGTE :@%s %s" %(args.to, args.msg)
-            if args.dontsend:
-                js8callapi.set_text(cmd)
-            else:
-                js8callapi.send_message(cmd)
+        send_aprs_sms(args.to, args.msg, args.dontsend, cfg)
     elif args.command == "setgrid":
-        js8callapi = JS8CallAPI(cfg['js8call_host'], cfg['js8call_port'])
-        location = Location(gpsd_host=cfg['gpsd_host'], gpsd_port=cfg['gpsd_port'])
-        mh = location.maidenhead(level=cfg['grid_level'])
-        if mh['lock']:
-            js8callapi.set_grid(mh['grid'])
-        else:
-            print("No GPS lock. Couldn't set JS8Call grid square.")
-            exit(1)
+        set_js8call_grid(cfg)
+    else:
+        se("Invalid command use --help for valid commands.\n")
+        exit(1)

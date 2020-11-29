@@ -1,5 +1,5 @@
 """
-GPS and location functionality for JS8Call
+This file is part of js8cli by ThreeSixes https://github.com/threesixes
 """
 
 from pprint import pprint

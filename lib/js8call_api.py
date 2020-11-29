@@ -1,5 +1,6 @@
+
 """
-JS8Call API implementation
+This file is part of js8cli by ThreeSixes https://github.com/threesixes
 """
 
 from pprint import pprint
@@ -46,8 +47,6 @@ class JS8CallAPI:
             try:
                 s.connect((self.__host, self.__port))
                 s.sendall(msg.encode())
-            except:
-                print(traceback.format_exc())
             finally:
                 s.close()
 
@@ -66,8 +65,6 @@ class JS8CallAPI:
 
         try:
             sent = sock.sendto(msg, server_address)
-        except:
-            print(traceback.format_exc())
         finally:
             sock.close()
 

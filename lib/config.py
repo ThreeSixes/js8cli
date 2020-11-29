@@ -1,10 +1,11 @@
 """
-JS8Call CLI configurator
+This file is part of js8cli by ThreeSixes https://github.com/threesixes
 """
 
 from pprint import pprint
 import json
 import os
+import sys
 
 class Configurator:
     """
@@ -14,6 +15,14 @@ class Configurator:
 
         self.__overrides = {}
         self.__config_file = config_file
+        self.__log_levels = {
+            "default": 0,
+            "debug": 10,
+            "info": 20,
+            "warn": 30,
+            "error": 40,
+            "critical": 50
+        }
 
 
     def configure(self):
@@ -25,8 +34,17 @@ class Configurator:
 
         with open(self.__config_file, "r") as f:
             config = json.loads(f.read())
-        
+
         config.update(self.__overrides)
+
+        if 'daemon_log_level' in config:
+            if config['daemon_log_level'] in self.__log_levels:
+                config['daemon_log_level'] = self.__log_levels[config['daemon_log_level']]
+            else:
+                sys.stderr.write("daemon_log_level should be set to one of: %s.\n"
+                    %self.__log_levels.keys())
+        else:
+            config['daemon_log_level'] = self.__log_levels['default']
 
         return config
 

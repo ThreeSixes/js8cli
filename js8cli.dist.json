@@ -1,8 +1,11 @@
 {
+  "aprs_loc_update_min": 0,
+  "daemon_log_level": "info",
   "gpsd_host": "127.0.0.1",
   "gpsd_port": 2947,
-  "grid_level": 6,
+  "grid_level": 4,
   "js8call_host": "127.0.0.1",
+  "js8call_loc_refresh_min": 5,
   "js8call_port": 2442,
   "js8call_proto": "tcp"
 }
