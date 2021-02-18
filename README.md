@@ -11,7 +11,22 @@ This simple utility is designed to facilitate updating JS8Call's location and to
 - JS8Call installed and running
 
 ## Setup
-lksajflakjsdfljdsf
+
+To set the project up copy it to a folder such as `/opt/threesixes/js8cli` and add that folder to your `PATH` variable so you can use it on the CLI. As the user the project will run as execute `pip3 install -r requrirements.txt`. This will install the necessary Python libraries.
+
+You should then edit copy the distributed configuration file as the proper config the application will use: `cp config.dist.json config.json`.
+
+Now edit the file. You can modify any of the following properties. The defaults are at the end of this README:
+
+- `aprs_loc_update_min`: This triggers APRS updates in minutes. `0` disables updates.
+- `gpsd_host`: This is the host that's running GPSD. It's typically `127.0.0.1`.
+- `gpsd_port`: This is the port that's running GPSD. It's typically `2947`.
+- `grid_level`: The accuracy of the Maidenhead grid square to use with JS8Call. Accepts `1`-`5`, 1 being a 2 character grid square locator and 5 being a 10 character grid square.
+- `js8call_host`: The host JS8Call is running on. This is typically `127.0.0.1`.
+- `js8call_loc_refresh_min`: How many minutes between JS8Call location updates?
+- `js8call_port`: The port JS8Call is running on.
+- `js8call_proto`: The protocol being used by the JS8Call API. Can be `tcp` or `udp`.
+
 
 ## How to use as a CLI utility
 ### To update JS8Call's grid square location based on GPS location:
@@ -44,6 +59,7 @@ Optional arguments:
 
 
 ## Automatically updating JS8Call location and/or APRS grid location periodically.
+
 This is accomplished by either exeuting `js8cli daemon` or by copying the systemd configuration file into place, enabling and starting it after configuring `aprs_loc_update_min` and `js8call_loc_refresh_min` in `js8cli.json`. These settings configure the timing of APRS location updates in minutes and the JS8Call location updates from the GPS in minutes as well.
 
 After the configuration file has been modified the systemd unit can be copied into place and set up using the following commands:
@@ -52,7 +68,7 @@ After the configuration file has been modified the systemd unit can be copied in
 sudo cp util/js8cli.service /etc/systemd/system
 ```
 
-Edit the systemd unit file at `/etc/systemd/system/js8cli.service` with your favorite editor. Set the `User` parameter to a user with access to the path the script is run in. This example assumes you've installed the script and configuration in `/opt/threesixes`. If that's not the case change the working directory and path to the script.
+Edit the systemd unit file at `/etc/systemd/system/js8cli.service` with your favorite editor. Set the `User` parameter to a user with access to the path the project is run in. This example assumes you've installed the project folder and configuration in `/opt/threesixes`. If that's not the case change the working directory and path to the project.
 
 ```
 sudo systemctl enable js8cli
