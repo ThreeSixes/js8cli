@@ -116,7 +116,8 @@ class Automator:
                     %(self.__config['js8call_host'], self.__config['js8call_port']))
             if try_action:
                 time.sleep(self.__retry_timers[step])
-                step += 1
+                if step < len(step):
+                    step += 1
 
 
     def run(self):
