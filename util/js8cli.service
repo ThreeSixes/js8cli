@@ -2,8 +2,10 @@
 Description=JS8CLI service
 
 [Service]
+User=threesixes
 Type=simple
-ExecStart="/opt/threesixes/js8cli/js8cli daemon"
+ExecStart=/opt/threesixes/js8cli/js8cli daemon
+WorkingDirectory=/opt/threesixes/js8cli
 
 [Install]
 WantedBy=multi-user.target

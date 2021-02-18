@@ -50,17 +50,22 @@ After the configuration file has been modified the systemd unit can be copied in
 
 ```bash
 sudo cp util/js8cli.service /etc/systemd/system
+```
+
+Edit the systemd unit file at `/etc/systemd/system/js8cli.service` with your favorite editor. Set the `User` parameter to a user with access to the path the script is run in. This example assumes you've installed the script and configuration in `/opt/threesixes`. If that's not the case change the working directory and path to the script.
+
+```
 sudo systemctl enable js8cli
 sudo systemctl start js8cli
 ```
 
-### Configuration
+### Default configuration
 ```json
 {
   "aprs_loc_update_min": 0,
   "gpsd_host": "127.0.0.1",
   "gpsd_port": 2947,
-  "grid_level": 4,
+  "grid_level": 5,
   "js8call_host": "127.0.0.1",
   "js8call_loc_refresh_min": 5,
   "js8call_port": 2442,
