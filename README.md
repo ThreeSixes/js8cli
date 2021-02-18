@@ -9,12 +9,13 @@ This simple utility is designed to facilitate updating JS8Call's location and to
 - PIP installed
 - GPSD installed and running
 - JS8Call installed and running
+- JS8Call's TCP or UDP API should be enabled in the configuration.
 
 ## Setup
 
-To set the project up copy it to a folder such as `/opt/threesixes/js8cli` and add that folder to your `PATH` variable so you can use it on the CLI. As the user the project will run as execute `pip3 install -r requrirements.txt`. This will install the necessary Python libraries.
+To set the project up copy it to a folder such as `/opt/threesixes/js8cli` and add that folder to your `PATH` variable so you can use it on the CLI. As the user the project will run as execute `pip3 install -r requirements.txt`. This will install the necessary Python libraries.
 
-You should then edit copy the distributed configuration file as the proper config the application will use: `cp config.dist.json config.json`.
+You should then edit copy the distributed configuration file as the proper config the application will use: `cp js8cli.dist.json js8cli.json`.
 
 Now edit the file. You can modify any of the following properties. The defaults are at the end of this README:
 
