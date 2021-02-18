@@ -28,7 +28,7 @@ def send_aprs_sms(to, msg, dontsend, cfg):
         exit(1)
     else:
         try:
-            cmd = "@APRSIS CMD :SMSGTE :@%s %s" %(args.to, args.msg)
+            cmd = "@APRSIS CMD :SMSGTE   :@%s %s" %(args.to, args.msg)
             if dontsend:
                 js8callapi.set_text(cmd)
             else:
