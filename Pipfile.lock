@@ -1,0 +1,35 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "bb35f66ec24e768dd0142ace6e323feb2ba6d7dae5eefa6265127dff801a1b23"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.8"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "gpsd-py3": {
+            "hashes": [
+                "sha256:2908d3bd78dfb6720ecfe22f97e139b5a4a198f38df3a77215cf644a33513192"
+            ],
+            "index": "pypi",
+            "version": "==0.3.0"
+        },
+        "maidenhead": {
+            "hashes": [
+                "sha256:6f515b9b966fcc3d6b891b341300802d6abb340f03ef18f5416d35966868d5cd"
+            ],
+            "index": "pypi",
+            "version": "==1.5.0"
+        }
+    },
+    "develop": {}
+}
