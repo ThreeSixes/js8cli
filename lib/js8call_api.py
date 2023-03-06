@@ -83,7 +83,7 @@ class JS8CallAPI:
         self.__send_message(grid_msg)
 
 
-    def send_message(self, msg):
+    def send_message(self, text):
         """
         Send a message.
         """
@@ -91,7 +91,7 @@ class JS8CallAPI:
         set_msg = {
             "params": {},
             "type": "TX.SEND_MESSAGE",
-            "value": msg
+            "value": text
         } 
 
         self.__send_message(set_msg)
