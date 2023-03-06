@@ -152,7 +152,7 @@ if __name__ == '__main__':
     cmd_desccription = """js8cli is a simple command-line utility and daemon to interact with js8call."""
     parser = argparse.ArgumentParser(description=cmd_desccription)
     parser.add_argument('command', type=str, 
-                        help='Command to execute: aprsgrid, aprssms, daemon, setgrid')
+                        help='Command to execute: aprsemail, aprsgrid, aprssms, daemon, setgrid')
     parser.add_argument('-d', dest="dontsend", default=False, action="store_true",
                         help="Don't send immediately. Use with commands that send messages.")
     parser.add_argument('--js8-host', type=str, default=None,
