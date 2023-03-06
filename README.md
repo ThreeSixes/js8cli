@@ -48,6 +48,17 @@ Optional arguments:
 
 `-d` prevents JS8Call from sending the message allowing the user to choose when to send it.
 
+### To send an e-mail via APRS using EMAIL-2:
+
+`js8cli aprsemail --to jane@doe.com --msg "Hello, Jane."`
+
+Where `--to` specifies an e-mail address, and `--msg` is the message content you wish to send.
+
+Optional arguments:
+
+`-d` prevents JS8Call from sending the message allowing the user to choose when to send it.
+
+
 ### To send an SMS via APRS using SMSGTE:
 
 `js8cli aprssms --to 5555555555 --msg "Hello, world."`
